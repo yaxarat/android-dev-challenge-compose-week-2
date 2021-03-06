@@ -15,14 +15,64 @@
  */
 package com.example.androiddevchallenge.ui.screen
 
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.androiddevchallenge.data.TimerItemEntity
+import com.example.androiddevchallenge.ui.component.TimerListBottomSheetContentComponent
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @Composable
 fun TimerListScreen(
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
     viewModel: TimerListScreenViewModel,
 ) {
-    Text("We are the screen!")
+    val state: TimerListState = viewModel.state
+    val subjectList: List<TimerItemEntity> = state.timerItemList
+    val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+
+    // ApplyThemeToSystemUi(windows = window)
+
+    BottomSheetScaffold(
+        sheetContent = {
+            TimerListBottomSheetContentComponent(
+                scaffoldState = bottomSheetScaffoldState,
+                onCreateTimer = { },
+            )
+        },
+        sheetBackgroundColor = MaterialTheme.colors.surface,
+        sheetElevation = 12.dp,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        scaffoldState = bottomSheetScaffoldState,
+        sheetPeekHeight = 64.dp,
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(it)
+                .padding(top = 24.dp)
+        ) {
+            // itemsIndexed(items = subjectList) { index, subject ->
+            //     SwipeableSubjectCard(
+            //         subject = subject,
+            //         boxHeight = 140.dp,
+            //         onClickDelete = {  },
+            //         onClickArchive = {  }
+            //     )
+            // }
+        }
+    }
 }

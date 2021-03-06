@@ -16,7 +16,17 @@
 package com.example.androiddevchallenge
 
 import android.app.Application
+import com.github.ajalt.timberkt.BuildConfig
+import com.github.ajalt.timberkt.Timber
+import com.github.ajalt.timberkt.Timber.DebugTree
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class BaseApplication : Application()
+class BaseApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
+    }
+}

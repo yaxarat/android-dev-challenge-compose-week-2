@@ -23,6 +23,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,6 +41,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -67,35 +69,6 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
             }
-
-            // MyTheme {
-            //     MyApp()
-            // }
         }
     }
 }
-
-// Start building your app here!
-@Composable
-fun MyApp() {
-    Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
-    }
-}
-
-//
-// @Preview("Light Theme", widthDp = 360, heightDp = 640)
-// @Composable
-// fun LightPreview() {
-//     MyTheme {
-//         MyApp()
-//     }
-// }
-//
-// @Preview("Dark Theme", widthDp = 360, heightDp = 640)
-// @Composable
-// fun DarkPreview() {
-//     MyTheme(darkTheme = true) {
-//         MyApp()
-//     }
-// }
