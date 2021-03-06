@@ -19,7 +19,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "subject")
+@Entity(tableName = "timer_item")
 data class TimerItemEntity(
 
     @PrimaryKey(autoGenerate = true)

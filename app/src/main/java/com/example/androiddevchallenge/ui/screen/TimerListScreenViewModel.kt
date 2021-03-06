@@ -21,7 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.Repository
 import com.example.androiddevchallenge.data.TimerItemEntity
+import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.UpdateTimerList
+import com.example.androiddevchallenge.util.minutesToSeconds
 import com.github.ajalt.timberkt.d
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,13 +33,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimerListScreenViewModel @Inject constructor(repository: Repository) : ViewModel() {
+class TimerListScreenViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val initialState = TimerListState(timerItemList = emptyList())
 
-    private val _state: MutableState<TimerListState> = mutableStateOf(initialState)
-
-    val state = _state.value
+    val state: MutableState<TimerListState> = mutableStateOf(initialState)
 
     init {
         repository.timerItemList
@@ -52,20 +52,51 @@ class TimerListScreenViewModel @Inject constructor(repository: Repository) : Vie
 
     fun onIntention(intent: TimerListIntent) {
         viewModelScope.launch {
-            val currentState = state.also { state ->
+            val currentState = state.value.also { state ->
                 d { "current state: $state\n intent: $intent" }
             }
 
             when(intent) {
                 is UpdateTimerList -> {
-                    _state.value = currentState.copy(timerItemList = intent.newList)
+                    state.value = currentState.copy(timerItemList = intent.newList)
+                }
+                is CreateNewTimer -> {
+                    createNewTimerItem(
+                        title = intent.name,
+                        color = intent.color,
+                        timerInSeconds = getTimeInSecondsLong(timeInMinutesString = intent.timeInMinutes)
+                    )
                 }
             }
         }
     }
 
+    private fun getTimeInSecondsLong(timeInMinutesString: String): Long {
+        val minutesOrZero = timeInMinutesString.toLongOrNull() ?: 0L
+
+        return minutesOrZero.minutesToSeconds()
+    }
+
+    // TODO: convert to upsert usecase?
+    private fun createNewTimerItem(
+        title: String,
+        color: String,
+        timerInSeconds: Long
+    ) {
+        viewModelScope.launch {
+            repository.insertTimerItem(
+                TimerItemEntity(
+                    id = 0,
+                    title = title,
+                    color = color,
+                    timerInSeconds = timerInSeconds
+                )
+            )
+        }
+    }
+
     companion object {
-        val viewModelKey: String = TimerListScreenViewModel.javaClass.simpleName
+        val viewModelKey: String = TimerListScreenViewModel::class.java.simpleName
     }
 }
 
@@ -73,4 +104,5 @@ data class TimerListState(val timerItemList: List<TimerItemEntity>)
 
 sealed class TimerListIntent {
     data class UpdateTimerList(val newList: List<TimerItemEntity>) : TimerListIntent()
+    data class CreateNewTimer(val name: String, val timeInMinutes: String, val color: String) : TimerListIntent()
 }

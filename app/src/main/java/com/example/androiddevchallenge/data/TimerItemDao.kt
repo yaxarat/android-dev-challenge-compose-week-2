@@ -32,10 +32,10 @@ interface TimerItemDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(timerItemEntity: TimerItemEntity)
 
-    @Query("SELECT * FROM subject")
+    @Query("SELECT * FROM timer_item")
     fun observeAll(): Flow<List<TimerItemEntity>>
 
-    @Query("SELECT * FROM subject WHERE id = :id")
+    @Query("SELECT * FROM timer_item WHERE id = :id")
     fun observeWithId(id: Int): Flow<TimerItemEntity>
 
     @Delete

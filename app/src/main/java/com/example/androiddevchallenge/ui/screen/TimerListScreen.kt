@@ -26,10 +26,12 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.data.TimerItemEntity
+import com.example.androiddevchallenge.ui.component.SwipeableCardComponent
 import com.example.androiddevchallenge.ui.component.TimerListBottomSheetContentComponent
 
 @ExperimentalComposeUiApi
@@ -40,8 +42,8 @@ fun TimerListScreen(
     onToggleTheme: () -> Unit,
     viewModel: TimerListScreenViewModel,
 ) {
-    val state: TimerListState = viewModel.state
-    val subjectList: List<TimerItemEntity> = state.timerItemList
+    val state: MutableState<TimerListState> = viewModel.state
+    val timerItemList: List<TimerItemEntity> = state.value.timerItemList
     val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
     // ApplyThemeToSystemUi(windows = window)
@@ -50,12 +52,17 @@ fun TimerListScreen(
         sheetContent = {
             TimerListBottomSheetContentComponent(
                 scaffoldState = bottomSheetScaffoldState,
-                onCreateTimer = { },
+                onCreateTimer = { createTimerItem ->
+                    viewModel.onIntention(createTimerItem)
+                },
             )
         },
         sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetElevation = 12.dp,
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        sheetShape = RoundedCornerShape(
+            topStart = 20.dp,
+            topEnd = 20.dp
+        ),
         scaffoldState = bottomSheetScaffoldState,
         sheetPeekHeight = 64.dp,
     ) {
@@ -65,14 +72,14 @@ fun TimerListScreen(
                 .padding(it)
                 .padding(top = 24.dp)
         ) {
-            // itemsIndexed(items = subjectList) { index, subject ->
-            //     SwipeableSubjectCard(
-            //         subject = subject,
-            //         boxHeight = 140.dp,
-            //         onClickDelete = {  },
-            //         onClickArchive = {  }
-            //     )
-            // }
+            itemsIndexed(items = timerItemList) { index, timerItem ->
+                SwipeableCardComponent(
+                    timerItem = timerItem,
+                    collapsedBoxHeight = 140.dp,
+                    expandedBoxHeight = 280.dp,
+                    onClickDelete = { },
+                )
+            }
         }
     }
 }

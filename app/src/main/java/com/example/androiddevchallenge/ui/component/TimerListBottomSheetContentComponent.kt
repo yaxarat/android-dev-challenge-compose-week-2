@@ -15,11 +15,18 @@
  */
 package com.example.androiddevchallenge.ui.component
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.Button
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,17 +37,20 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.androiddevchallenge.ui.resource.CardColors
+import com.example.androiddevchallenge.ui.screen.TimerListIntent
+import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun TimerListBottomSheetContentComponent(
     scaffoldState: BottomSheetScaffoldState,
-    onCreateTimer: () -> Unit,
+    onCreateTimer: (TimerListIntent) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scrollState = rememberScrollState()
-    val title = remember { mutableStateOf("") }
+    // val scrollState = rememberScrollState()
+    val name = remember { mutableStateOf("") }
     val timerLength = remember { mutableStateOf("") }
     // val timerColor = remember { mutableStateOf("") }
 
@@ -58,8 +68,8 @@ fun TimerListBottomSheetContentComponent(
         horizontalAlignment = Alignment.Start
     ) {
         OutlinedTextField(
-            value = title.value,
-            onValueChange = { title.value = it },
+            value = name.value,
+            onValueChange = { name.value = it },
             label = { Text("Name of the activity", style = MaterialTheme.typography.body1) },
             placeholder = { Text("Practice chess", style = MaterialTheme.typography.body1) },
             modifier = Modifier
@@ -91,17 +101,17 @@ fun TimerListBottomSheetContentComponent(
             )
         )
 
-        Text(
-            text = "Card Color",
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 32.dp,
-                    top = 16.dp,
-                    end = 32.dp
-                )
-        )
+        // Text(
+        //     text = "Card Color",
+        //     style = MaterialTheme.typography.body1,
+        //     modifier = Modifier
+        //         .fillMaxWidth()
+        //         .padding(
+        //             start = 32.dp,
+        //             top = 16.dp,
+        //             end = 32.dp
+        //         )
+        // )
 
 
         // Update or use library
@@ -119,10 +129,16 @@ fun TimerListBottomSheetContentComponent(
 
         Button(
             onClick = {
-//                onCreateSubject()
-//                LaunchedEffect(Unit) {
-//                    scaffoldState.bottomSheetState.collapse()
-//                }
+                onCreateTimer(
+                    CreateNewTimer(
+                        name = name.value,
+                        timeInMinutes = timerLength.value,
+                        color = CardColors.LIGHT_TEAL.name
+                    )
+                )
+                // LaunchedEffect(Unit) {
+                //     scaffoldState.bottomSheetState.collapse()
+                // }
             },
             modifier = Modifier
                 .padding(vertical = 16.dp, horizontal = 32.dp)
