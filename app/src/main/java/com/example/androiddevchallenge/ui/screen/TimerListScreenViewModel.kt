@@ -62,7 +62,7 @@ class TimerListScreenViewModel @Inject constructor(private val repository: Repos
                 logStateAndIntent(state = state, intent = intent)
             }
 
-            when(intent) {
+            when (intent) {
                 is UpdateTimerList -> {
                     state.value = currentState.copy(
                         timerItemList = intent.newList,
