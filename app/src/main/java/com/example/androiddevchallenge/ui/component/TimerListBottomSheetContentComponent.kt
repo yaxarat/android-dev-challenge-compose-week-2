@@ -31,11 +31,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,8 +48,6 @@ import com.example.androiddevchallenge.ui.screen.TimerListIntent
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -55,6 +56,7 @@ fun TimerListBottomSheetContentComponent(
     scope: CoroutineScope,
     scaffoldState: BottomSheetScaffoldState,
     onCreateTimer: (TimerListIntent) -> Unit,
+    onChangeColor: (Color) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val lazyListState = rememberLazyListState()
@@ -86,6 +88,7 @@ fun TimerListBottomSheetContentComponent(
                     color = it,
                     onClick = { color ->
                         timerColor = color
+                        onChangeColor(CardColors.valueOf(timerColor).color)
                     }
                 )
             }
@@ -131,7 +134,7 @@ fun TimerListBottomSheetContentComponent(
                     CreateNewTimer(
                         name = name,
                         timeInMinutes = timerLength,
-                        color = timerColor
+                        color = if (timerColor.isNullOrBlank()) CardColors.LIGHT_GREY.name else timerColor
                     )
                 )
 

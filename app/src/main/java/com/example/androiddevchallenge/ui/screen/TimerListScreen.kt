@@ -15,6 +15,7 @@
  */
 package com.example.androiddevchallenge.ui.screen
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +28,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,8 @@ import com.example.androiddevchallenge.ui.component.SwipeableCardComponent
 import com.example.androiddevchallenge.ui.component.TimerListBottomSheetContentComponent
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.DeleteTimerItemAt
 import java.util.HashMap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -46,11 +51,14 @@ fun TimerListScreen(
     onToggleTheme: () -> Unit,
     viewModel: TimerListScreenViewModel,
 ) {
+    val initialBottomSheetColor = MaterialTheme.colors.surface
     val scope = viewModel.viewModelScope
     val state: MutableState<TimerListState> = viewModel.state
     val timerItemList: List<TimerItemEntity> = state.value.timerItemList
     val itemToTimerMap: HashMap<Int, CustomTimer> = state.value.itemToTimerMap
     val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+    var bottomSheetColor by remember { mutableStateOf(initialBottomSheetColor) }
+    val animatedColor by animateColorAsState(targetValue = bottomSheetColor)
 
     BottomSheetScaffold(
         sheetContent = {
@@ -60,9 +68,10 @@ fun TimerListScreen(
                 onCreateTimer = { createTimerItem ->
                     viewModel.onIntention(createTimerItem)
                 },
+                onChangeColor = { bottomSheetColor = it }
             )
         },
-        sheetBackgroundColor = MaterialTheme.colors.surface,
+        sheetBackgroundColor = animatedColor,
         sheetElevation = 12.dp,
         sheetShape = RoundedCornerShape(
             topStart = 20.dp,

@@ -68,7 +68,10 @@ fun SwipeableCardComponent(
     BoxWithConstraints(modifier = Modifier.animateContentSize()) {
 
         if (expanded) {
-            BottomSwipeableCardComponent(onClickDelete = onClickDelete, height = bottomCardHeight)
+            BottomSwipeableCardComponent(
+                onClickDelete = onClickDelete,
+                height = bottomCardHeight
+            )
         }
 
         Card(

@@ -4,6 +4,7 @@ import android.view.View
 import android.view.Window
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 
@@ -11,7 +12,7 @@ import androidx.compose.ui.graphics.toArgb
 fun ApplySystemUiComponent(windows: Window) =
     MaterialTheme {
         windows.statusBarColor = MaterialTheme.colors.surface.toArgb()
-        windows.navigationBarColor = MaterialTheme.colors.surface.toArgb()
+        windows.navigationBarColor = Color.Black.toArgb()
 
         @Suppress("DEPRECATION")
         if (MaterialTheme.colors.surface.luminance() > 0.5f) {
