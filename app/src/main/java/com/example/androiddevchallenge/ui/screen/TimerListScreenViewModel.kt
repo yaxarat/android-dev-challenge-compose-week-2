@@ -21,12 +21,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.Repository
 import com.example.androiddevchallenge.data.TimerItemEntity
-import com.example.androiddevchallenge.service.Timer
+import com.example.androiddevchallenge.service.CustomTimer
+import com.example.androiddevchallenge.service.CustomTimerImpl
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.UpdateTimerList
 import com.example.androiddevchallenge.util.exhaustive
 import com.example.androiddevchallenge.util.minutesToSeconds
-import com.example.androiddevchallenge.util.secondsToMillis
 import com.github.ajalt.timberkt.d
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -112,19 +112,18 @@ class TimerListScreenViewModel @Inject constructor(private val repository: Repos
 
     private fun assignTimerIfMissing(
         timerItemList: List<TimerItemEntity>,
-        itemToTimerMap: HashMap<Int, Timer>
-    ): HashMap<Int, Timer> {
+        itemToTimerMap: HashMap<Int, CustomTimer>
+    ): HashMap<Int, CustomTimer> {
         timerItemList
             .filterNot { itemToTimerMap.containsKey(it.id) }
             .forEach { timerItem ->
-                itemToTimerMap[timerItem.id] = getCountDownTimerWithLimit(timerItem.timerInSeconds.secondsToMillis())
+                itemToTimerMap[timerItem.id] = getCustomTimer()
             }
 
         return itemToTimerMap
     }
 
-    private fun getCountDownTimerWithLimit(limitMillis: Long): Timer =
-        Timer(limitMillis)
+    private fun getCustomTimer(): CustomTimer = CustomTimerImpl()
 
     private fun logStateAndIntent(
         state: TimerListState,
@@ -139,7 +138,7 @@ class TimerListScreenViewModel @Inject constructor(private val repository: Repos
 
 data class TimerListState(
     val timerItemList: List<TimerItemEntity>,
-    val itemToTimerMap: HashMap<Int, Timer>,
+    val itemToTimerMap: HashMap<Int, CustomTimer>,
 )
 
 sealed class TimerListIntent {

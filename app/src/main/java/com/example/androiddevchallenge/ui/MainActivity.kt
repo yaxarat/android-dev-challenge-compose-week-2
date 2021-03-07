@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.androiddevchallenge.ui.component.ApplySystemUiComponent
 import com.example.androiddevchallenge.ui.navigation.Screen
 import com.example.androiddevchallenge.ui.screen.TimerListScreen
 import com.example.androiddevchallenge.ui.screen.TimerListScreenViewModel
@@ -45,7 +46,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val window = window.apply {
+            setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        }
+
         setContent {
+            ApplySystemUiComponent(window)
             val navController = rememberNavController()
 
             NavHost(

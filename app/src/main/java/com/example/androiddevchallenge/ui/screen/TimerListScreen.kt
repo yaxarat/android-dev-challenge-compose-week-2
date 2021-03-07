@@ -15,7 +15,6 @@
  */
 package com.example.androiddevchallenge.ui.screen
 
-import android.os.CountDownTimer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.TimerItemEntity
-import com.example.androiddevchallenge.service.Timer
+import com.example.androiddevchallenge.service.CustomTimer
 import com.example.androiddevchallenge.ui.component.SwipeableCardComponent
 import com.example.androiddevchallenge.ui.component.TimerListBottomSheetContentComponent
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.DeleteTimerItemAt
@@ -50,7 +49,7 @@ fun TimerListScreen(
     val scope = viewModel.viewModelScope
     val state: MutableState<TimerListState> = viewModel.state
     val timerItemList: List<TimerItemEntity> = state.value.timerItemList
-    val itemToTimerMap: HashMap<Int, Timer> = state.value.itemToTimerMap
+    val itemToTimerMap: HashMap<Int, CustomTimer> = state.value.itemToTimerMap
     val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
     // ApplyThemeToSystemUi(windows = window)
@@ -83,10 +82,11 @@ fun TimerListScreen(
             itemsIndexed(items = timerItemList) { index, timerItem ->
                 itemToTimerMap[timerItem.id]?.let { timer ->
                     SwipeableCardComponent(
+                        scope = scope,
                         timerItem = timerItem,
                         countDownTimer = timer,
-                        collapsedBoxHeight = 120.dp,
-                        expandedBoxHeight = 300.dp,
+                        collapsedBoxHeight = 110.dp,
+                        expandedBoxHeight = 230.dp,
                         onClickDelete = { viewModel.onIntention(DeleteTimerItemAt(index)) },
                     )
                 }

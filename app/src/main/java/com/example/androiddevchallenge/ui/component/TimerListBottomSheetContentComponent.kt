@@ -58,7 +58,7 @@ fun TimerListBottomSheetContentComponent(
 
     BottomSheetTitleComponent(
         expandedTitle = "Swipe down to cancel",
-        collapsedTitle = "Swipe up to create new timer",
+        collapsedTitle = "Swipe up to create a new timer",
         bottomSheetScaffoldState = scaffoldState
     )
 
@@ -72,7 +72,7 @@ fun TimerListBottomSheetContentComponent(
         OutlinedTextField(
             value = name.value,
             onValueChange = { name.value = it },
-            label = { Text("Name of the activity", style = MaterialTheme.typography.body1) },
+            label = { Text("Name of the timer", style = MaterialTheme.typography.body1) },
             placeholder = { Text("Practice chess", style = MaterialTheme.typography.body1) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,7 +89,7 @@ fun TimerListBottomSheetContentComponent(
         OutlinedTextField(
             value = timerLength.value,
             onValueChange = { timerLength.value = it },
-            label = { Text("Initial hours to start", style = MaterialTheme.typography.body1) },
+            label = { Text("Count down time in minutes", style = MaterialTheme.typography.body1) },
             placeholder = { Text("30", style = MaterialTheme.typography.body1) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,6 +141,7 @@ fun TimerListBottomSheetContentComponent(
 
                 scope.launch {
                     scaffoldState.bottomSheetState.collapse()
+                    keyboardController?.hideSoftwareKeyboard()
                 }
             },
             modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.androiddevchallenge.ui.component
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -40,15 +41,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.data.TimerItemEntity
-import com.example.androiddevchallenge.service.Timer
+import com.example.androiddevchallenge.service.CustomTimer
+import com.example.androiddevchallenge.ui.component.TimerState.CANCELLED
+import com.example.androiddevchallenge.ui.component.TimerState.PAUSED
+import com.example.androiddevchallenge.ui.component.TimerState.STARTED
+import com.example.androiddevchallenge.util.exhaustive
 import com.example.androiddevchallenge.util.getFormattedDurationHMS
+import com.example.androiddevchallenge.util.secondsToMillis
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlin.math.roundToInt
 
 @ExperimentalMaterialApi
 @Composable
 fun SwipeableCardComponent(
+    scope: CoroutineScope,
     timerItem: TimerItemEntity,
-    countDownTimer: Timer,
+    countDownTimer: CustomTimer,
     onClickDelete: () -> Unit,
     expandedBoxHeight: Dp,
     collapsedBoxHeight: Dp
@@ -59,9 +69,10 @@ fun SwipeableCardComponent(
         0f to CardState.DEFAULT,
         200f to CardState.DELETE_RIGHT
     )
-    var expanded by remember { mutableStateOf(false)}
+    var timerState by remember { mutableStateOf(CANCELLED) }
+    var expanded by remember { mutableStateOf(false) }
     val boxHeight by animateDpAsState(targetValue = if (expanded) expandedBoxHeight else collapsedBoxHeight)
-
+    var currentTimerValue by remember { mutableStateOf(getFormattedDurationHMS(timerItem.timerInSeconds.secondsToMillis())) }
 
     Box {
         Card(
@@ -137,35 +148,111 @@ fun SwipeableCardComponent(
                 )
         ) {
             Column(
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier.clickable(
-                    onClick = {
-                        expanded = !expanded
-                    }
-                )
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable(
+                        onClick = {
+                            expanded = !expanded
+                        }
+                    )
             ) {
                 Text(
                     text = timerItem.title,
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.onSurface,
+                    maxLines = 1,
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.CenterHorizontally)
-                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp)
+                        .padding(start = 16.dp, top = 16.dp, end = 32.dp, bottom = 32.dp)
                 )
 
-                Text(
-                    text = getFormattedDurationHMS(countDownTimer.millisUntilFinished.value),
-                    style = MaterialTheme.typography.h6,
-                    color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                )
-                
-                OutlinedButton(onClick = countDownTimer::start) {
-                    Text(text = "Start")
+                if (expanded) {
+                    Text(
+                        text = currentTimerValue,
+                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colors.onSurface,
+                        maxLines = 1,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                            .padding(start = 16.dp, end = 32.dp, bottom = 16.dp)
+                    )
+
+                    Crossfade(targetState = timerState) {
+                        when (it) {
+                            STARTED -> {
+                                countDownTimer.millisecondsRemaining
+                                    .onEach {
+                                        currentTimerValue = getFormattedDurationHMS(it)
+                                    }
+                                    .launchIn(scope)
+
+                                OutlinedButton(
+                                    onClick = {
+                                        timerState = PAUSED
+                                        countDownTimer.stop()
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
+                                ) {
+                                    Text(text = "PAUSE")
+                                }
+                            }
+                            PAUSED -> {
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            timerState = STARTED
+                                            countDownTimer.start(
+                                                countUpToSeconds = timerItem.timerInSeconds,
+                                                withSecondsInterval = 1,
+                                                inCountDownMode = true
+                                            )
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.5f)
+                                            .padding(start = 16.dp, end = 9.dp, bottom = 32.dp)
+                                    ) {
+                                        Text(text = "RESUME")
+                                    }
+
+                                    OutlinedButton(
+                                        onClick = {
+                                            timerState = CANCELLED
+                                            countDownTimer.cancel()
+                                            currentTimerValue = getFormattedDurationHMS(timerItem.timerInSeconds.secondsToMillis())
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 9.dp, end = 16.dp, bottom = 32.dp)
+                                    ) {
+                                        Text(text = "CANCEL")
+                                    }
+                                }
+                            }
+                            CANCELLED -> {
+                                OutlinedButton(
+                                    onClick = {
+                                        timerState = STARTED
+                                        countDownTimer.start(
+                                            countUpToSeconds = timerItem.timerInSeconds,
+                                            withSecondsInterval = 1,
+                                            inCountDownMode = true
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
+                                ) {
+                                    Text(text = "START")
+                                }
+                            }
+                        }.exhaustive
+                    }
                 }
             }
         }
@@ -176,4 +263,10 @@ enum class CardState {
     DELETE_LEFT,
     DELETE_RIGHT,
     DEFAULT,
+}
+
+enum class TimerState {
+    STARTED,
+    PAUSED,
+    CANCELLED
 }
