@@ -36,6 +36,7 @@ import com.example.androiddevchallenge.service.CustomTimer
 import com.example.androiddevchallenge.ui.component.TimerState.CANCELLED
 import com.example.androiddevchallenge.ui.component.TimerState.PAUSED
 import com.example.androiddevchallenge.ui.component.TimerState.STARTED
+import com.example.androiddevchallenge.ui.resource.CardColors
 import com.example.androiddevchallenge.util.exhaustive
 import com.example.androiddevchallenge.util.getFormattedDurationHMS
 import com.example.androiddevchallenge.util.secondsToMillis
@@ -73,10 +74,13 @@ fun SwipeableCardComponent(
         Card(
             shape = RoundedCornerShape(15.dp),
             elevation = 12.dp,
-            // backgroundColor = CardColors.valueOf(timerItem.color).color,
+            backgroundColor = CardColors.valueOf(timerItem.color).color,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp, vertical = 16.dp)
+                .onGloballyPositioned { layoutCoordinates ->
+                    bottomCardHeight = layoutCoordinates.size.height.dp
+                }
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                 .swipeable(
                     state = swipeableState,
@@ -84,9 +88,6 @@ fun SwipeableCardComponent(
                     thresholds = { _, _ -> FractionalThreshold(0.3f) },
                     orientation = Orientation.Horizontal
                 )
-                .onGloballyPositioned { layoutCoordinates ->
-                    bottomCardHeight = layoutCoordinates.size.height.dp
-                }
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +100,7 @@ fun SwipeableCardComponent(
             ) {
                 Text(
                     text = timerItem.title,
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.h6,
                     color = MaterialTheme.colors.onSurface,
                     maxLines = 1,
                     modifier = Modifier
@@ -117,7 +118,7 @@ fun SwipeableCardComponent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentWidth(Alignment.CenterHorizontally)
-                            .padding(start = 16.dp, end = 32.dp, bottom = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 32.dp)
                     )
 
                     Crossfade(targetState = timerState) {

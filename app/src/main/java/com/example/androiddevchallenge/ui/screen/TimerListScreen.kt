@@ -52,8 +52,6 @@ fun TimerListScreen(
     val itemToTimerMap: HashMap<Int, CustomTimer> = state.value.itemToTimerMap
     val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
-    // ApplyThemeToSystemUi(windows = window)
-
     BottomSheetScaffold(
         sheetContent = {
             TimerListBottomSheetContentComponent(

@@ -30,8 +30,8 @@ fun BottomSwipeableCardComponent(onClickDelete: () -> Unit, height: Dp) {
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(height / 2)
             .padding(horizontal = 42.dp, vertical = 18.dp)
+            .height(height / 2 - 43.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

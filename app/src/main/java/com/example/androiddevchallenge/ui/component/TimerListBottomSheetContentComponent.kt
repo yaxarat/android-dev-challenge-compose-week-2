@@ -15,9 +15,13 @@
  */
 package com.example.androiddevchallenge.ui.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomSheetScaffoldState
@@ -41,6 +45,8 @@ import com.example.androiddevchallenge.ui.screen.TimerListIntent
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -51,10 +57,10 @@ fun TimerListBottomSheetContentComponent(
     onCreateTimer: (TimerListIntent) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    // val scrollState = rememberScrollState()
-    val name = remember { mutableStateOf("") }
-    val timerLength = remember { mutableStateOf("") }
-    // val timerColor = remember { mutableStateOf("") }
+    val lazyListState = rememberLazyListState()
+    var name by remember { mutableStateOf("") }
+    var timerLength by remember { mutableStateOf("") }
+    var timerColor by remember { mutableStateOf("") }
 
     BottomSheetTitleComponent(
         expandedTitle = "Swipe down to cancel",
@@ -62,16 +68,32 @@ fun TimerListBottomSheetContentComponent(
         bottomSheetScaffoldState = scaffoldState
     )
 
-
     Column(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 32.dp),
         horizontalAlignment = Alignment.Start
     ) {
+        LazyRow(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
+            state = lazyListState
+        ) {
+            items(CardColors.values()) {
+                ColorPickerTileComponent(
+                    color = it,
+                    onClick = { color ->
+                        timerColor = color
+                    }
+                )
+            }
+        }
+
         OutlinedTextField(
-            value = name.value,
-            onValueChange = { name.value = it },
+            value = name,
+            onValueChange = { name = it },
             label = { Text("Name of the timer", style = MaterialTheme.typography.body1) },
             placeholder = { Text("Practice chess", style = MaterialTheme.typography.body1) },
             modifier = Modifier
@@ -87,8 +109,8 @@ fun TimerListBottomSheetContentComponent(
         )
 
         OutlinedTextField(
-            value = timerLength.value,
-            onValueChange = { timerLength.value = it },
+            value = timerLength,
+            onValueChange = { timerLength = it },
             label = { Text("Count down time in minutes", style = MaterialTheme.typography.body1) },
             placeholder = { Text("30", style = MaterialTheme.typography.body1) },
             modifier = Modifier
@@ -103,39 +125,13 @@ fun TimerListBottomSheetContentComponent(
             )
         )
 
-        // Text(
-        //     text = "Card Color",
-        //     style = MaterialTheme.typography.body1,
-        //     modifier = Modifier
-        //         .fillMaxWidth()
-        //         .padding(
-        //             start = 32.dp,
-        //             top = 16.dp,
-        //             end = 32.dp
-        //         )
-        // )
-
-
-        // Update or use library
-//        ScrollableRow(
-//            horizontalArrangement = Arrangement.SpaceAround,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 16.dp),
-//            scrollState = scrollState
-//        ) {
-//            for (color in CardColors.values()) {
-//                ColorPickerTile(color = color, onClick = { onColorChange(it) })
-//            }
-//        }
-
         Button(
             onClick = {
                 onCreateTimer(
                     CreateNewTimer(
-                        name = name.value,
-                        timeInMinutes = timerLength.value,
-                        color = CardColors.LIGHT_TEAL.name
+                        name = name,
+                        timeInMinutes = timerLength,
+                        color = timerColor
                     )
                 )
 
@@ -143,9 +139,13 @@ fun TimerListBottomSheetContentComponent(
                     scaffoldState.bottomSheetState.collapse()
                     keyboardController?.hideSoftwareKeyboard()
                 }
+
+                name = ""
+                timerLength = ""
             },
             modifier = Modifier
                 .padding(vertical = 16.dp, horizontal = 32.dp)
+                .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         ) {
             Text("Save", style = MaterialTheme.typography.body1)
