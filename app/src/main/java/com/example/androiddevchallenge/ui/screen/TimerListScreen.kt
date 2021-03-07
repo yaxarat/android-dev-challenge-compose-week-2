@@ -85,8 +85,6 @@ fun TimerListScreen(
                         scope = scope,
                         timerItem = timerItem,
                         countDownTimer = timer,
-                        collapsedBoxHeight = 110.dp,
-                        expandedBoxHeight = 230.dp,
                         onClickDelete = { viewModel.onIntention(DeleteTimerItemAt(index)) },
                     )
                 }
