@@ -21,6 +21,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -39,12 +40,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.data.TimerItemEntity
+import com.example.androiddevchallenge.service.Timer
+import com.example.androiddevchallenge.util.getFormattedDurationHMS
 import kotlin.math.roundToInt
 
 @ExperimentalMaterialApi
 @Composable
 fun SwipeableCardComponent(
     timerItem: TimerItemEntity,
+    countDownTimer: Timer,
     onClickDelete: () -> Unit,
     expandedBoxHeight: Dp,
     collapsedBoxHeight: Dp
@@ -86,7 +90,9 @@ fun SwipeableCardComponent(
                             imageVector = Icons.Rounded.DeleteForever,
                             contentDescription = "Delete",
                             tint = MaterialTheme.colors.onPrimary,
-                            modifier = Modifier.size(45.dp).padding(start = 15.dp)
+                            modifier = Modifier
+                                .size(45.dp)
+                                .padding(start = 15.dp)
                         )
                     }
                 }
@@ -105,7 +111,9 @@ fun SwipeableCardComponent(
                             imageVector = Icons.Rounded.DeleteForever,
                             contentDescription = "Delete",
                             tint = MaterialTheme.colors.onPrimary,
-                            modifier = Modifier.size(45.dp).padding(end = 15.dp)
+                            modifier = Modifier
+                                .size(45.dp)
+                                .padding(end = 15.dp)
                         )
                     }
                 }
@@ -138,13 +146,27 @@ fun SwipeableCardComponent(
             ) {
                 Text(
                     text = timerItem.title,
+                    style = MaterialTheme.typography.h5,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp)
+                )
+
+                Text(
+                    text = getFormattedDurationHMS(countDownTimer.millisUntilFinished.value),
                     style = MaterialTheme.typography.h6,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentWidth(Alignment.Start)
-                        .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 )
+                
+                OutlinedButton(onClick = countDownTimer::start) {
+                    Text(text = "Start")
+                }
             }
         }
     }

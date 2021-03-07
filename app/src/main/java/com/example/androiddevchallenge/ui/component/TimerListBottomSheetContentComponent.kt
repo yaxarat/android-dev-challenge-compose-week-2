@@ -18,7 +18,6 @@ package com.example.androiddevchallenge.ui.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomSheetScaffoldState
@@ -40,11 +39,14 @@ import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.ui.resource.CardColors
 import com.example.androiddevchallenge.ui.screen.TimerListIntent
 import com.example.androiddevchallenge.ui.screen.TimerListIntent.CreateNewTimer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun TimerListBottomSheetContentComponent(
+    scope: CoroutineScope,
     scaffoldState: BottomSheetScaffoldState,
     onCreateTimer: (TimerListIntent) -> Unit,
 ) {
@@ -136,9 +138,10 @@ fun TimerListBottomSheetContentComponent(
                         color = CardColors.LIGHT_TEAL.name
                     )
                 )
-                // LaunchedEffect(Unit) {
-                //     scaffoldState.bottomSheetState.collapse()
-                // }
+
+                scope.launch {
+                    scaffoldState.bottomSheetState.collapse()
+                }
             },
             modifier = Modifier
                 .padding(vertical = 16.dp, horizontal = 32.dp)

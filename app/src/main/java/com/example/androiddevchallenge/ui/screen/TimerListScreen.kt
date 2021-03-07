@@ -15,6 +15,7 @@
  */
 package com.example.androiddevchallenge.ui.screen
 
+import android.os.CountDownTimer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,9 +31,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.example.androiddevchallenge.data.TimerItemEntity
+import com.example.androiddevchallenge.service.Timer
 import com.example.androiddevchallenge.ui.component.SwipeableCardComponent
 import com.example.androiddevchallenge.ui.component.TimerListBottomSheetContentComponent
+import com.example.androiddevchallenge.ui.screen.TimerListIntent.DeleteTimerItemAt
+import java.util.HashMap
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -42,8 +47,10 @@ fun TimerListScreen(
     onToggleTheme: () -> Unit,
     viewModel: TimerListScreenViewModel,
 ) {
+    val scope = viewModel.viewModelScope
     val state: MutableState<TimerListState> = viewModel.state
     val timerItemList: List<TimerItemEntity> = state.value.timerItemList
+    val itemToTimerMap: HashMap<Int, Timer> = state.value.itemToTimerMap
     val bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
     // ApplyThemeToSystemUi(windows = window)
@@ -51,6 +58,7 @@ fun TimerListScreen(
     BottomSheetScaffold(
         sheetContent = {
             TimerListBottomSheetContentComponent(
+                scope = scope,
                 scaffoldState = bottomSheetScaffoldState,
                 onCreateTimer = { createTimerItem ->
                     viewModel.onIntention(createTimerItem)
@@ -73,12 +81,15 @@ fun TimerListScreen(
                 .padding(top = 24.dp)
         ) {
             itemsIndexed(items = timerItemList) { index, timerItem ->
-                SwipeableCardComponent(
-                    timerItem = timerItem,
-                    collapsedBoxHeight = 140.dp,
-                    expandedBoxHeight = 280.dp,
-                    onClickDelete = { },
-                )
+                itemToTimerMap[timerItem.id]?.let { timer ->
+                    SwipeableCardComponent(
+                        timerItem = timerItem,
+                        countDownTimer = timer,
+                        collapsedBoxHeight = 120.dp,
+                        expandedBoxHeight = 300.dp,
+                        onClickDelete = { viewModel.onIntention(DeleteTimerItemAt(index)) },
+                    )
+                }
             }
         }
     }
